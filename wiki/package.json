@@ -3,13 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "axios": "^0.18.0",
+    "clone": "^2.1.2",
     "koa": "^2.6.1",
     "koa-body": "^4.0.4",
     "koa-router": "^7.4.0",
     "mysql": "^2.16.0",
     "react": "^16.6.1",
+    "react-d3-tree": "^1.12.0",
     "react-dom": "^16.6.1",
-    "react-scripts": "2.1.1"
+    "react-redux": "^5.1.1",
+    "react-scripts": "2.1.1",
+    "redux": "^4.0.1"
   },
   "scripts": {
     "start": "react-scripts start",

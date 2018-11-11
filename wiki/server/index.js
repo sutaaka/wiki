@@ -21,29 +21,38 @@ const promisedQuery = (word,type) =>{ return new Promise((resolve, reject) => {
   })
 }
 
-async function getSubcategory(word){
-const subcatResults = []
+async function getPage(word){
+  const results = await promisedQuery(word,'page')
+
+  data = results.map(result =>{
+    return result.child.toString('utf-8')
+  })
+
+  return data
+}
+
+async function getCategory(word){
+const categoryResults = []
 const results = await promisedQuery(word,'subcat')
 
 for(let i=0; i<results.length; i++){
-  subcatResults[i] = await promisedQuery(results[i].child.toString('utf-8'),'subcat')
+  categoryResults[i] = await promisedQuery(results[i].child.toString('utf-8'),'subcat')
 }
-//console.log(subcatResults[0])
 
-  const parents = results.map(result => result.child.toString('utf-8'))
+  const categories = results.map(result => result.child.toString('utf-8'))
 
-  const data = parents.map(parent =>{
-      return {parent: {
-        name: parent,
-        child: []
+  const data = categories.map(category =>{
+      return {category: {
+        name: category,
+        category: []
       }
     }
   })
 
   for(let i=0; i<results.length; i++){
-    for(let j=0; j<subcatResults[i].length; j++){
-      if(data[i].parent.name === subcatResults[i][j].parent.toString('utf-8')){
-        data[i].parent.child.push(subcatResults[i][j].child.toString('utf-8'))
+    for(let j=0; j<categoryResults[i].length; j++){
+      if(data[i].category.name === categoryResults[i][j].parent.toString('utf-8')){
+        data[i].category.category.push(categoryResults[i][j].child.toString('utf-8'))
       }
     }
   }
@@ -51,27 +60,31 @@ for(let i=0; i<results.length; i++){
     return data
 }
 
-//getSubcategory('学問')
 router
-  .get('/', async (ctx, next) => {
-    ctx.body = await getSubcategory('主要カテゴリ')
-    console.log(ctx.body)
-    return next()
-  })
-  .post('/', async (ctx, next) => {
+  .post('/category', async (ctx, next) => {
+    const data = []
     const { word } = ctx.request.body
-
-    ctx.body = await getSubcategory(word)
+    results = await getCategory(word)
+    for(let i=0; i<3; i++){
+      data[i] = results[i].category.name
+    }
+    ctx.body = data
+    console.log(ctx.body)
     ctx.status = 201
   })
-
+  .post('/page', async (ctx, next) =>{
+    const { word } = ctx.request.body
+    ctx.body = await getPage(word)
+    console.log(ctx.body)
+    ctx.status = 201
+  })
 
 
 app
   .use((ctx, next) => {
     ctx.set('Access-Control-Allow-Origin', '*');
     ctx.set('Access-Control-Allow-Headers', 'Content-Type');
-    // ctx.set('Access-Control-Allow-Methods', 'GET,POST,HEAD,OPTIONS');
+    ctx.set('Access-Control-Allow-Methods', 'GET,POST,HEAD,OPTIONS');
     return next()
   })
   .use(koaBody())
