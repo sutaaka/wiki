@@ -14,7 +14,7 @@ const connection = mysql.createConnection({
 
 connection.connect();
 const promisedQuery = (word,type) =>{ return new Promise((resolve, reject) => {
-        connection.query(`SELECT cl_to AS parent, page_title AS child FROM page JOIN categorylinks ON categorylinks.cl_from=page.page_id WHERE categorylinks.cl_type = "${type}" AND categorylinks.cl_to = "${word}";`, function (error, results, fields) {
+        connection.query(`SELECT cl_to AS parent, page_title AS child, cl_from AS url FROM page JOIN categorylinks ON categorylinks.cl_from=page.page_id WHERE categorylinks.cl_type = "${type}" AND categorylinks.cl_to = "${word}";`, function (error, results, fields) {
             if (error) reject(error)
             resolve(results)
       })
@@ -25,24 +25,28 @@ async function getPage(word){
   const results = await promisedQuery(word,'page')
 
   data = results.map(result =>{
-    return result.child.toString('utf-8')
+    return {page: {
+      name: result.child.toString('utf-8'),
+      url: `https://ja.wikipedia.org/?curid=${result.url}`
+    }
+    }
   })
 
   return data
 }
 
 async function getCategory(word){
-const categoryResults = []
-const results = await promisedQuery(word,'subcat')
+  const categoryResults = []
+  const results = await promisedQuery(word,'subcat')
 
-for(let i=0; i<results.length; i++){
-  categoryResults[i] = await promisedQuery(results[i].child.toString('utf-8'),'subcat')
-}
+  for(let i=0; i<results.length; i++){
+    categoryResults[i] = await promisedQuery(results[i].child.toString('utf-8'),'subcat')
+  }
 
   const categories = results.map(result => result.child.toString('utf-8'))
 
   const data = categories.map(category =>{
-      return {category: {
+    return {category: {
         name: category,
         category: []
       }
@@ -65,6 +69,8 @@ router
     const data = []
     const { word } = ctx.request.body
     results = await getCategory(word)
+    console.log(results)
+   //const data = results.map(result => result.category.name)
     for(let i=0; i<3; i++){
       data[i] = results[i].category.name
     }

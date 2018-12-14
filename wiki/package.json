@@ -5,6 +5,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "clone": "^2.1.2",
+    "immutability-helper": "^2.8.1",
     "koa": "^2.6.1",
     "koa-body": "^4.0.4",
     "koa-router": "^7.4.0",
