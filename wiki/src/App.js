@@ -4,7 +4,16 @@ import './App.css';
 // import { Provider } from 'react-redux'
 import Tree from 'react-d3-tree';
 import axios from 'axios';
-import clone from 'clone'
+import clone from 'clone';
+//import update from 'immutability-helper';
+
+//const selectList = []
+
+function sleep(waitMsec) {
+  var startMsec = new Date();
+
+  while (new Date() - startMsec < waitMsec);
+}
 
 const getAncestorNodeNames = (nodeData, names = []) => {
   const newNames = names.concat(nodeData.name)
@@ -15,7 +24,45 @@ const getAncestorNodeNames = (nodeData, names = []) => {
   }
 }
 
+const selectNode = (data, nodeNames) => {
+  //console.log("fillColor")
+  const child = data.find(child => child.name === nodeNames[0])
+
+  if (nodeNames.length > 1) {
+    return selectNode(child.children, nodeNames.slice(1))
+  } else {
+    if(child.clicked){
+      console.log('true')
+      child.nodeSvgShape = {
+        shape: 'rect',
+        shapeProps: {
+        width: 20,
+        height: 20,
+        x: -10,
+        y: -10,
+        }
+      }
+      child.clicked = false
+    }
+    else{
+      //console.log(child)
+    child.nodeSvgShape = {
+    shape: 'rect',
+    shapeProps: {
+    width: 20,
+    height: 20,
+    x: -10,
+    y: -10,
+    fill: 'red'
+    }
+  }
+  child.clicked = true
+}
+  }
+}
+
 const mutateData = (data, nodeNames, categories) => {
+  //console.log(categories)
   const child = data.find(child => child.name === nodeNames[0])
 
   if (nodeNames.length > 1) {
@@ -27,6 +74,10 @@ const mutateData = (data, nodeNames, categories) => {
       }
     })
   }
+}
+
+const SelectList = (props) =>{
+  const selectList = props.selectList
 }
 
 const Pages = (props) => {
@@ -50,13 +101,14 @@ const svgSquare = {
 class App extends Component {
   constructor(props) {
     super(props);
+    this.onMouseOver = this.onMouseOver.bind(this)
     this.onClick = this.onClick.bind(this)
-    this.onContextMenu = this.onContextMenu.bind(this)
     this.state = {
+      select: [],
       pages: [],
       data: [
         {
-          name: '主要カテゴリ',
+          name: '学問',
           attributes: {
           },
           children: [
@@ -69,16 +121,35 @@ class App extends Component {
   componentDidMount() {
   }
 
-  onContextMenu(){
-    console.log("right")
+  componentDidUpdate(prevProps, prevState){
+    //console.log('sleep')
+    sleep(500)
+    //console.log('sleeped')
+    /* 再描画後に実際のDOMにアクセスするためのメソッド */
   }
 
+  onClick(nodeData, evt){
+    console.log("nodeData" + nodeData)
+    if(nodeData.clicked){
 
-  onClick(nodeData, evt) {
+    }
+    else{
+      //this.setState({ selectList: [this.state.selectList.concat(nodeData.name)] })
+    }
+    const data = clone(this.state.data)
+    const selects = this.state.select
+    const nodeNames = getAncestorNodeNames(nodeData).reverse()
+    selectNode(data, nodeNames)
+    selects.push(nodeData.name)
+    this.setState({ data })
+    this.setState({select: selects})
+    console.log('maekawa' + this.state.select)
+  }
+
+  onMouseOver(nodeData, evt) {
     console.log(nodeData)
-    if(! nodeData._children){
+    if(! nodeData.children){
       console.log('yay!')
-      console.log(nodeData._children)
       axios
         .post('http://localhost:3001/category', {
           word: nodeData.name
@@ -89,7 +160,6 @@ class App extends Component {
           mutateData(data, nodeNames, response.data)
           this.setState({ data })
         })
-
       axios
         .post('http://localhost:3001/page', {
           word: nodeData.name
@@ -101,7 +171,6 @@ class App extends Component {
     }
   }
 
-
   render() {
     return (
       <div id="root" style={{width: '1500px', height: '1000px', position: "relative", top: "5px", left: "5px"}}>
@@ -109,8 +178,8 @@ class App extends Component {
         <div id="treeWrapper" style={{width: '1000px', height: '1000px',position: "absolute", top: "15px", left: "15px"}}>
           <Tree
             data={this.state.data}
+            onMouseOver={this.onMouseOver}
             onClick={this.onClick}
-            onContextMenu={this.onClick}
             nodeSvgShape={svgSquare}
           />
         </div>
@@ -118,6 +187,7 @@ class App extends Component {
         <div id="pages" style={{width: '270px', height: '1000px', position: "absolute", top: "15px", left: "1020px"}}>
           <Pages pages={this.state.pages}/>
         </div>
+
       </div>
     );
   }

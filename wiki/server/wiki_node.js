@@ -81,13 +81,13 @@ const recursion = async (wordArray,index)　=>{
 
     //最後尾（現在処理）の配列の長さ分ループ
     for(i=0; i<wordArray[(wordArray.length - 1)].length; i++){
-        appendFile("test.txt", "\nLoopStart\n\n\n");
-        appendFile("test.txt", "\ni =" + i +"\n\n");
-        appendFile("test.txt", "\nwordArray\n");
-        wordArray.forEach(words =>{
-            appendFile("test.txt", words + "\n");
-        })
-        appendFile("test.txt", index + "\n\n");
+        //appendFile("test.txt", "\nLoopStart\n\n\n");
+        //appendFile("test.txt", "\ni =" + i +"\n\n");
+        //appendFile("test.txt", "\nwordArray\n");
+        //wordArray.forEach(words =>{
+        //    appendFile("test.txt", words + "\n");
+        //})
+        //appendFile("test.txt", index + "\n\n");
 
         //配列[i]のサブカテゴリ取得
         const results = await promisedQuery(wordArray[wordArray.length - 1][i],"subcat");
@@ -95,7 +95,7 @@ const recursion = async (wordArray,index)　=>{
 
         //サブカテゴリがない場合
         if(results.length < 1){
-            appendFile("test.txt", "\npage\n");
+            //appendFile("test.txt", "\npage\n");
             console.log('page');
             //配列[i]のサブページ取得
             const pages = await promisedQuery(wordArray[wordArray.length - 1][i],"page");
