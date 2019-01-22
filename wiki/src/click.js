@@ -103,12 +103,13 @@ class App extends Component {
     super(props);
     this.onMouseOver = this.onMouseOver.bind(this)
     this.onClick = this.onClick.bind(this)
+    this.onClickLi = this.onClickLi.bind(this)
     this.state = {
       select: [],
       pages: [],
       data: [
         {
-          name: '学問',
+          name: '音楽',
           attributes: {
           },
           children: [
@@ -130,18 +131,21 @@ class App extends Component {
 
   onClickLi(e) {
     e.stopPropagation()  // ** コード追加 **
-    console.log('<li> was clicked.')
+    console.log('this' + this.state.select)
     axios
-        .post('http://localhost:3001/category', {
-          word: "学問"
+        .post('http://localhost:3001/search', {
+          word: this.state.select
         })
         .then((response) => {
+          //console.log(response)
+          this.setState({ pages: response.data })
           console.log(response)
+        })
           // const data = clone(this.state.data)
           //const nodeNames = getAncestorNodeNames(nodeData).reverse()
           //mutateData(data, nodeNames, response.data)
           //this.setState({ data })
-        })
+
 }
 
 
@@ -190,14 +194,15 @@ class App extends Component {
           mutateData(data, nodeNames, response.data)
           this.setState({ data })
         })
-      axios
-        .post('http://localhost:3001/page', {
-          word: nodeData.name
-        })
-        .then((response) => {
-          //console.log(response)
-          this.setState({ pages: response.data })
-        })
+      // axios
+        // .post('http://localhost:3001/page', {
+          // word: nodeData.name
+        // })
+        // .then((response) => {
+          // console.log('res')
+          // console.log(response)
+          // this.setState({ pages: response.data })
+        // })
     }
   }
 
@@ -218,9 +223,11 @@ class App extends Component {
           <Pages pages={this.state.pages}/>
         </div>
 
-        <div>
+        <div id="select">
           <ul onClick={this.onClickLi}>
-            <li></li>
+            <button type="button">
+              <li></li>
+            </button>
           </ul>
         </div>
 
