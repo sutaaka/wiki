@@ -25,15 +25,13 @@ const getAncestorNodeNames = (nodeData, names = []) => {
 }
 
 const selectNode = (data, nodeNames) => {
-  console.log("fillColor")
-  // console.log(data)
+  //console.log("fillColor")
   const child = data.find(child => child.name === nodeNames[0])
-
 
   if (nodeNames.length > 1) {
     return selectNode(child.children, nodeNames.slice(1))
   } else {
-    if(child.selected){
+    if(child.clicked){
       console.log('true')
       child.nodeSvgShape = {
         shape: 'rect',
@@ -44,7 +42,7 @@ const selectNode = (data, nodeNames) => {
         y: -10,
         }
       }
-      child.selected = false
+      child.clicked = false
     }
     else{
       //console.log(child)
@@ -58,7 +56,7 @@ const selectNode = (data, nodeNames) => {
     fill: 'red'
     }
   }
-  child.selected = true
+  child.clicked = true
 }
   }
 }
@@ -67,7 +65,7 @@ const mutateData = (data, nodeNames, categories) => {
   //console.log(categories)
   const child = data.find(child => child.name === nodeNames[0])
 
-  child.clicked = true
+  child.overed = true
   if (nodeNames.length > 1) {
     return mutateData(child.children, nodeNames.slice(1), categories)
   } else {
@@ -85,7 +83,7 @@ const SelectList = (props) =>{
 
 const Pages = (props) => {
   console.log(props)
-  const pages = props.pages.map((page,index) => <li key={index}><a href={page.page.url}>{page.page.name}</a></li>)
+  const pages = props.pages.map((page,index) => <li key={index}>{page.page.name}</li>)
   return (
     <ul>{pages}</ul>
   )
@@ -116,8 +114,8 @@ class App extends Component {
           attributes: {
           },
           children: [
-            {name: '山'},
-            {name: '日本の食文化'}
+            {name: '登山'},
+            {name: '駅弁'}
           ],
         },
       ]
@@ -156,93 +154,64 @@ class App extends Component {
 
   onClick(nodeData, evt){
     console.log("nodeData" + nodeData)
-    if(! nodeData.clicked){
-      if(! nodeData.children){
-        console.log('yay!')
-        axios
-          .post('http://localhost:3001/category', {
-            word: nodeData.name
-          })
-          .then((response) => {
-            const data = clone(this.state.data)
-            const nodeNames = getAncestorNodeNames(nodeData).reverse()
-            mutateData(data, nodeNames, response.data)
-            console.log('data')
-            console.log({data})
-            this.setState({ data })
-          })
-        //   axios
-        //     .post('http://localhost:3001/page', {
-        //       word: nodeData.name
-        //     })
-        //     .then((response) => {
-        //       console.log('res')
-        //       console.log(response)
-        //       this.setState({ pages: response.data })
-        //     })
-      }
+    if(nodeData.clicked){
+
     }
     else{
       //this.setState({ selectList: [this.state.selectList.concat(nodeData.name)] })
-
-      const data = clone(this.state.data)
-      const ss = clone(this.state.select)
-      const nodeNames = getAncestorNodeNames(nodeData).reverse()
-      selectNode(data, nodeNames)
-      console.log('ss')
-      console.log(ss)
-      console.log(nodeData.name)
-
-      if(ss.indexOf(nodeData.name) >= 0){
-        console.log('fill')
-         const selects = ss.filter(function(select) {
-          return select !== nodeData.name;
-        });
-        console.log("fill  = " + selects)
-        this.setState({select: selects})
-      }
-      else{
-        console.log('push')
-        const selects = ss
-        selects.push(nodeData.name)
-        this.setState({select: selects})
-      }
-      this.setState({ data })
-      console.log('maekawa' + this.state.select)
     }
-}
+    const data = clone(this.state.data)
+    const ss = this.state.select
+    const nodeNames = getAncestorNodeNames(nodeData).reverse()
+    selectNode(data, nodeNames)
 
-
-    onMouseOver(nodeData, evt) {
-      //  console.log(nodeData)
-    //   if(! nodeData.overed){
-    //   if(! nodeData.children){
-    //     console.log('yay!')
-    //     axios
-    //       .post('http://localhost:3001/category', {
-    //         word: nodeData.name
-    //       })
-    //       .then((response) => {
-    //         const data = clone(this.state.data)
-    //         const nodeNames = getAncestorNodeNames(nodeData).reverse()
-    //         mutateData(data, nodeNames, response.data)
-    //         console.log('data')
-    //         console.log({data})
-    //         this.setState({ data })
-    //       })
-    //   //   axios
-    //   //     .post('http://localhost:3001/page', {
-    //   //       word: nodeData.name
-    //   //     })
-    //   //     .then((response) => {
-    //   //       console.log('res')
-    //   //       console.log(response)
-    //   //       this.setState({ pages: response.data })
-    //   //     })
-    //   }
-    // }
+    if(ss.indexOf(nodeData.name) >= 0){
+      console.log('fill')
+       const selects = ss.filter(function(select) {
+        return select !== nodeData.name;
+      });
+      console.log("fill  = " + selects)
+      this.setState({select: selects})
+    }
+    else{
+      console.log('push')
+      const selects = ss
+      selects.push(nodeData.name)
+      this.setState({select: selects})
+    }
+    this.setState({ data })
+    console.log('maekawa' + this.state.select)
   }
 
+  onMouseOver(nodeData, evt) {
+    console.log(nodeData)
+    if(! nodeData.overed){
+    if(! nodeData.children){
+      console.log('yay!')
+      axios
+        .post('http://localhost:3001/category', {
+          word: nodeData.name
+        })
+        .then((response) => {
+          const data = clone(this.state.data)
+          const nodeNames = getAncestorNodeNames(nodeData).reverse()
+          mutateData(data, nodeNames, response.data)
+          console.log('data')
+          console.log({data})
+          this.setState({ data })
+        })
+    //   axios
+    //     .post('http://localhost:3001/page', {
+    //       word: nodeData.name
+    //     })
+    //     .then((response) => {
+    //       console.log('res')
+    //       console.log(response)
+    //       this.setState({ pages: response.data })
+    //     })
+    }
+  }
+}
 
   render() {
     return (
@@ -264,7 +233,7 @@ class App extends Component {
         <div id="select">
           <ul onClick={this.onClickLi}>
             <button type="button">
-              <li>検索</li>
+              <li></li>
             </button>
           </ul>
         </div>
