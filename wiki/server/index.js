@@ -257,10 +257,10 @@ router
     const { word } = ctx.request.body
     results = await getCategory(word)
     console.log(results)
-    data = results.map(result => result.category.name)
-    // for(let i=0; i<3; i++){
-      // data[i] = results[i].category.name
-    // }
+    // data = results.map(result => result.category.name)
+    for(let i=0; i<3; i++){
+      data[i] = results[i].category.name
+    }
     ctx.body = data
     console.log(ctx.body)
     ctx.status = 201

@@ -117,7 +117,9 @@ class App extends Component {
           },
           children: [
             {name: '山'},
-            {name: '日本の食文化'}
+            {name: '日本の食文化'},
+            {name: '演歌歌手'},
+            {name: '馬主'}
           ],
         },
       ]
