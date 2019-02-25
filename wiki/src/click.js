@@ -116,10 +116,8 @@ class App extends Component {
           attributes: {
           },
           children: [
-            {name: '山'},
+            {name: '地形'},
             {name: '日本の食文化'},
-            {name: '演歌歌手'},
-            {name: '馬主'}
           ],
         },
       ]

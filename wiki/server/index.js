@@ -256,11 +256,21 @@ router
     data = []
     const { word } = ctx.request.body
     results = await getCategory(word)
-    console.log(results)
+    console.log(word)
     // data = results.map(result => result.category.name)
-    for(let i=0; i<3; i++){
-      data[i] = results[i].category.name
+    if(word === '地形'){
+      console.log('if')
+      for(let i=55; i<57; i++){
+         data.push(results[i].category.name)
+      }
     }
+    else{
+      for(let i=0; i<3; i++){
+        if(results[i]){
+         data[i] = results[i].category.name
+        }
+    }
+  }
     ctx.body = data
     console.log(ctx.body)
     ctx.status = 201
@@ -286,9 +296,10 @@ router
       else{
           body = await get(word)
           console.log('len')
-          console.log(body.length)
+          console.log(json.length)
           if(body.length>0){
           if(json.length>9){
+            console.log('jsonif')
             json.shift()
             json.push({selects : {
               name : word,
@@ -296,6 +307,7 @@ router
             }})
           }
           else{
+            console.log()
             json.push({selects : {
               name : word,
               results : body
@@ -314,12 +326,17 @@ router
       }
     }
     else{
-      ctx.body = [{page:{
-        name: 'No results'
-      }}]
+      const { word } = ctx.request.body
+      const results = await getPage(word[0])
+      // console.log(results)
+      // ctx.body = [{page:{
+        // name: 'No results'
+      // }}]
+      console.log(results.length)
+      ctx.body = results
     }
     console.log("ctx.body")
-    console.log(ctx.body)
+    // console.log(ctx.body)
     const endTime = Date.now(); // 終了時間
     console.log('time')
     console.log((endTime - startTime)/1000 + ' 秒')

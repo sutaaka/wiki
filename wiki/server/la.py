@@ -68,6 +68,11 @@ def recursion(wordArray,indexes):
                 newIndex[len(indexes)-1] +=1
                 print('@@@@@@@@@@@@@しない終了')
 
+        else:
+             #pages = subpage(item)
+             #if len(pages) > 0:
+             #    pagein(newWordArray,newIndex,pages)
+
     print('------------再帰関数終了')
 
 
